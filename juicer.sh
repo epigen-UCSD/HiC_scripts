@@ -1,4 +1,7 @@
 #!/bin/bash
+set -x
+PS4='+\d+\t '
+export _JAVA_OPTIONS="-Xmx64g"
 ##########
 #The MIT License (MIT)
 #
@@ -155,6 +158,7 @@ done
 if [ ! -z "$stage" ]
 then
     case $stage in
+        postalign) postalign=1 ;;        
         merge) merge=1 ;;
         dedup) dedup=1 ;;
         early) earlyexit=1 ;;
@@ -209,6 +213,7 @@ then
 	DpnII) ligation="GATCGATC";;
 	MboI) ligation="GATCGATC";;
 	NcoI) ligation="CCATGCATGG";;
+        HaeIII) ligation="GGCC";;
 	none) ligation="XXXX";;
 	*)  ligation="XXXX"
 	    echo "$site not listed as recognized enzyme. Using $site_file as site file"
@@ -280,13 +285,13 @@ else
 fi
 
 ## Create output directory, only if not in merge, dedup, final, or postproc stages
-if [[ -d "$outputdir" && -z "$final" && -z "$merge" && -z "$dedup" && -z "$postproc" ]] 
+if [[ -d "$outputdir" && -z "$final" && -z "$merge" && -z "$dedup" && -z "$postproc" && -z "$postalign" ]] 
 then
     echo "***! Move or remove directory \"$outputdir\" before proceeding."
     echo "***! Type \"juicer.sh -h \" for help"
     exit 1			
 else
-    if [[ -z "$final" && -z "$dedup" && -z "$merge" && -z "$postproc" ]]; then
+    if [[ -z "$final" && -z "$dedup" && -z "$merge" && -z "$postproc" && -z "$postalign" ]]; then
         mkdir "$outputdir" || { echo "***! Unable to create ${outputdir}, check permissions." ; exit 1; } 
     fi
 fi
@@ -367,10 +372,11 @@ then
             usegzip=1
         fi
 
-	source ${juiceDir}/scripts/common/countligations.sh
-
+        
+	[[ -z $postalign ]] && source ${juiceDir}/scripts/common/countligations.sh
+        
         # Align read1 
-        if [ -n "$shortread" ] || [ "$shortreadend" -eq 1 ]
+        if [ -n "$shortread" ] || [ "$shortreadend" -eq 1 ] && [ -z $postalign ] 
 	then
 	    echo "Running command bwa aln -q 15 $threadstring $refSeq $name1$ext > $name1$ext.sai && bwa samse $refSeq $name1$ext.sai $name1$ext > $name1$ext.sam"
 	    bwa aln -q 15 $threadstring $refSeq $name1$ext > $name1$ext.sai && bwa samse $refSeq $name1$ext.sai $name1$ext > $name1$ext.sam 
@@ -381,7 +387,8 @@ then
             else
                 echo "(-: Short align of $name1$ext.sam done successfully"
             fi
-        else
+        elif [ -z $postalign ]
+        then
             echo "Running command bwa mem $threadstring $refSeq $name1$ext > $name1$ext.sam" 
             bwa mem $threadstring $refSeq $name1$ext > $name1$ext.sam
             if [ $? -ne 0 ]
@@ -390,10 +397,12 @@ then
                 exit 1
             else                                                            
 		echo "(-:  Align of $name1$ext.sam done successfully"
-            fi                                    
+            fi
+        else
+            echo "Skipped read1"
         fi                                                              
         # Align read2
-        if [ -n "$shortread" ] || [ "$shortreadend" -eq 2 ]
+        if [ -n "$shortread" ] || [ "$shortreadend" -eq 2 ] && [ -z $postalign ] 
         then
             echo "Running command bwa aln -q 15 $threadstring $refSeq $name2$ext > $name2$ext.sai && bwa samse $refSeq $name2$ext.sai $name2$ext > $name2$ext.sam "
             bwa aln -q 15 $threadstring $refSeq $name2$ext > $name2$ext.sai && bwa samse $refSeq $name2$ext.sai $name2$ext > $name2$ext.sam 
@@ -404,7 +413,8 @@ then
             else
 		echo "(-: Short align of $name2$ext.sam done successfully"
             fi
-        else
+        elif [ -z $postalign ]
+        then
             echo "Running command bwa mem $threadstring $refSeq $name2$ext > $name2$ext.sam"
             bwa mem $threadstring $refSeq $name2$ext > $name2$ext.sam 
             if [ $? -ne 0 ]
@@ -414,51 +424,61 @@ then
             else
 		echo "(-: Mem align of $name2$ext.sam done successfully"
             fi
+        else
+            echo "Skipped read2"
 	fi
-        # sort read 1 aligned file by readname
-	sort -T $tmpdir -k1,1f $name1$ext.sam > $name1${ext}_sort.sam
-	if [ $? -ne 0 ]
-	then
-            echo "***! Error while sorting $name1$ext.sam"
-            exit 1
-	else
-            echo "(-: Sort read 1 aligned file by readname completed."
-	fi
-        # sort read 2 aligned file by readname
-	sort -T $tmpdir -k1,1f $name2$ext.sam > $name2${ext}_sort.sam
-	if [ $? -ne 0 ]
-	then
-            echo "***! Error while sorting $name2$ext.sam"
-            exit 1
-	else
-            echo "(-: Sort read 2 aligned file by readname completed."
-	fi                           
-        # add read end indicator to readname
-	awk 'BEGIN{OFS="\t"}NF>=11{$1=$1"/1"; print}' $name1${ext}_sort.sam > $name1${ext}_sort1.sam
-	awk 'BEGIN{OFS="\t"}NF>=11{$1=$1"/2"; print}' $name2${ext}_sort.sam > $name2${ext}_sort1.sam
-    
-	sort -T $tmpdir -k1,1f -m $name1${ext}_sort1.sam $name2${ext}_sort1.sam > ${name}${ext}.sam
-    
-	if [ $? -ne 0 ]
-	then
-            echo "***! Failure during merge of read files"
-            exit 1
-	else
-            rm $name1$ext*.sa* $name2$ext*.sa* 
-            echo "(-: $name$ext.sam created successfully."
-	fi
-    
-        # call chimeric_blacklist.awk to deal with chimeric reads; 
-        # sorted file is sorted by read name at this point
-	touch $name${ext}_abnorm.sam $name${ext}_unmapped.sam
-	awk -v "fname1"=$name${ext}_norm.txt -v "fname2"=$name${ext}_abnorm.sam -v "fname3"=$name${ext}_unmapped.sam -f ${juiceDir}/scripts/common/chimeric_blacklist.awk $name$ext.sam
-	if [ $? -ne 0 ]
-	then
-            echo "***! Failure during chimera handling of $name${ext}"
-            exit 1
-	fi
+
+        if [ -z $postalign ]
+        then
+           # sort read 1 aligned file by readname
+	   sort -T $tmpdir -k1,1f $name1$ext.sam > $name1${ext}_sort.sam
+	   if [ $? -ne 0 ]
+	   then
+               echo "***! Error while sorting $name1$ext.sam"
+               exit 1
+	   else
+               echo "(-: Sort read 1 aligned file by readname completed."
+	   fi
+           # sort read 2 aligned file by readname
+	   sort -T $tmpdir -k1,1f $name2$ext.sam > $name2${ext}_sort.sam
+	   if [ $? -ne 0 ]
+	   then
+               echo "***! Error while sorting $name2$ext.sam"
+               exit 1
+	   else
+               echo "(-: Sort read 2 aligned file by readname completed."
+	   fi                           
+           # add read end indicator to readname
+	   awk 'BEGIN{OFS="\t"}NF>=11{$1=$1"/1"; print}' $name1${ext}_sort.sam > $name1${ext}_sort1.sam
+	   awk 'BEGIN{OFS="\t"}NF>=11{$1=$1"/2"; print}' $name2${ext}_sort.sam > $name2${ext}_sort1.sam
+           
+	   sort -T $tmpdir -k1,1f -m $name1${ext}_sort1.sam $name2${ext}_sort1.sam > ${name}${ext}.sam
+           
+	   if [ $? -ne 0 ]
+	   then
+               echo "***! Failure during merge of read files"
+               exit 1
+	   else
+               rm $name1$ext*.sa* $name2$ext*.sa* 
+               echo "(-: $name$ext.sam created successfully."
+	   fi
+           
+           # call chimeric_blacklist.awk to deal with chimeric reads; 
+           # sorted file is sorted by read name at this point
+	   touch $name${ext}_abnorm.sam $name${ext}_unmapped.sam
+	   awk -v "fname1"=$name${ext}_norm.txt -v "fname2"=$name${ext}_abnorm.sam -v "fname3"=$name${ext}_unmapped.sam -f ${juiceDir}/scripts/common/chimeric_blacklist.awk $name$ext.sam
+	   if [ $? -ne 0 ]
+	   then
+               echo "***! Failure during chimera handling of $name${ext}"
+               exit 1
+	   fi
+        else
+            echo "skipped chimeric reads" 
+        fi
+        
         # if any normal reads were written, find what fragment they correspond to 
         # and store that
+        echo "finding norm frags"
 	if [ -e "$name${ext}_norm.txt" ] && [ "$site" != "none" ]
 	then
             ${juiceDir}/scripts/common/fragment.pl $name${ext}_norm.txt $name${ext}.frag.txt $site_file                                                                
@@ -499,9 +519,10 @@ then
         exit 1
     else
         echo "(-: Finished sorting all sorted files into a single merge."
-        rm -r ${tmpdir}
+        [[ -d ${tmpdir} ]] && rm -r ${tmpdir}
     fi
 fi
+
 #REMOVE DUPLICATES
 if [ -z $final ] && [ -z $postproc ]
 then
@@ -521,7 +542,7 @@ fi
 
 #STATISTICS
 #Skip if post-processing only is required
-if [ -z $postproc ]
+if [ -z $postproc ] 
 then        
     export _JAVA_OPTIONS=-Xmx16384m
     export LC_ALL=en_US.UTF-8 
@@ -547,7 +568,7 @@ fi
 if [ -z "$earlyexit" ]
 then
     #Skip if post-processing only is required
-    if [ -z $postproc ]
+    if [ ! -z $postproc ] 
     then        
         if [ "$nofrag" -eq 1 ]
         then 
