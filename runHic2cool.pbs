@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -q condo
+#PBS -N hic2cool  
+#PBS -l nodes=1:ppn=28
+#PBS -l walltime=8:00:00
+#PBS -V
+#PBS -m abe
+#PBS -A epigen-group
+
+
+source activate scanpy
+set -x
+PS4='[+\d \t] '
+#sample='RMM_307_1_2_3'
+workdir='/home/zhc268/scratch/juicer/work'
+#hic="inter.hic"
+hicfile="${workdir}/${sample}/aligned/${hic}"
+#hic2cool --version
+#hic2cool 0.7.3
+hic2cool convert $hicfile ${hicfile/.hic/.cool} 
+

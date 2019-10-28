@@ -1,0 +1,29 @@
+#!/bin/bash
+#PBS -q home-epigen
+#PBS -N juicer  
+#PBS -l nodes=1:ppn=28
+#PBS -l mem=96g 
+#PBS -l walltime=24:00:00
+#PBS -V
+#PBS -m abe
+#PBS -A epigen-group
+
+# -v sample=,mpq
+
+set -x
+PS4='+\d+\t '
+
+source activate hic
+module load cuda/8.0.44
+export _JAVA_OPTIONS="-Xmx64g"
+
+cd /home/zhc268/scratch/juicer/work/${sample}
+
+../../scripts/common/statistics.pl -s ../..//restriction_sites/hg19_MboI.txt \
+                                    -l GATCGATC -o /home/zhc268/scratch/juicer/work/${sample}/aligned/inter_${mpq}.txt \
+                                    -q ${mpq} /home/zhc268/scratch/juicer/work/${sample}/aligned/merged_nodups.txt
+
+../../scripts/common/juicer_tools pre -s /home/zhc268/scratch/juicer/work/${sample}/aligned/inter_${mpq}.txt \
+                                   -g /home/zhc268/scratch/juicer/work/${sample}/aligned/inter_${mpq}_hists.m \
+                                   -q ${mpq} /home/zhc268/scratch/juicer/work/${sample}/aligned/merged_nodups.txt \
+                                   /home/zhc268/scratch/juicer/work/${sample}/aligned/inter_${mpq}.hic hg19

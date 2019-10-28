@@ -1,0 +1,26 @@
+#!/bin/bash
+#PBS -q condo
+#PBS -N juicer  
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=8:00:00
+#PBS -V
+#PBS -m abe
+#PBS -A epigen-group
+
+# -v sample=
+source activate hic
+module load cuda/8.0.44
+#export LD_PRELOAD=/usr/lib64/libcuda.so.1
+
+mkdir -p /home/zhc268/scratch/juicer/work/${sample}/fastq
+#ln -s ~/data/seqdata/${sample}_R1.fastq.gz /home/zhc268/scratch/juicer/work/${sample}/fastq/
+#ln -s ~/data/seqdata/${sample}_R2.fastq.gz /home/zhc268/scratch/juicer/work/${sample}/fastq/
+
+
+[[ ! -z $stage ]] && s="-D $stage"
+
+cd /home/zhc268/scratch/juicer/work/${sample}
+../../scripts/juicer.sh $s -D ../../ # -s HaeIII
+
+rsync -avzru /home/zhc268/scratch/juicer/work/${sample} ~/data/outputs/juicer/
+
