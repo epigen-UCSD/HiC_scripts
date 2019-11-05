@@ -29,7 +29,6 @@ done
 ############################################################
 juicer_jar=/home/zhc268/data/software/juicer_github/CPU/common/juicer_tools.jar
 workdir='/home/zhc268/scratch/juicer/work/'
-peakfile=${workdir}/cecero_islet/beta.over.02.bedpe
 for peakfile in ${loopdir}*.bedpe
 do
     echo $peakfile
