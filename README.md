@@ -6,4 +6,5 @@
 
 * [hic tools](https://github.com/mdozmorov/HiC_tools) 
 * [cooler cli](https://cooler.readthedocs.io/en/latest/cli.html)
-* [HiCNorm](http://www.people.fas.harvard.edu/~junliu/HiCNorm/): [ren-lab](https://github.com/ren-lab/HiCNorm)
+* [HiCNorm](http://www.people.fas.harvard.edu/~junliu/HiCNorm/): [@ren-lab](https://github.com/ren-lab/HiCNorm)
+* [HiGlass data prepare](https://docs.higlass.io/data_preparation.html)
