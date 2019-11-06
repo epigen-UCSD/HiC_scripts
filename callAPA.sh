@@ -7,7 +7,7 @@ loopdir=${workdir}cicero_res_v2/
 ############################################################
 # make bined peak files for cicero results 
 ############################################################
-## cat with score bins
+
 cd $workdir 
 
 for f in ${loopdir}*all.pgl
@@ -24,37 +24,7 @@ do
 done
 
 
-## cat with score bins2: negative sets
-cd $workdir 
-
-for f in ${loopdir}*all.pgl
-do
-    echo $f
-    f1=${f/all.pgl/m05_05.bedpe}
-    f2=${f/all.pgl/m10_m05.bedpe}
-    f3=${f/all.pgl/m15_m10.bedpe}
-    f4=${f/all.pgl/m20_m15.bedpe}
-    f5=${f/all.pgl/lt_m20.bedpe}
-    awk -v OFS='\t' -v f1=$f1 -v f2=$f2 -v f3=$f3 -v f4=$f4 -v f5=$f5 '{if($7<-.2) {$7="0,255,0";print $0 > f5;}
-        else if($7 < -.15) {$7="0,255,0";print $0 > f4;} else if($7< -.1){$7="0,255,0";print $0 > f3;}
-        else if($7< -.05){$7="0,255,0";print $0 > f2;} else if($7<=0.05){$7="0,255,0";print $0 > f1;}}' $f
-    ls  ${f/all.pgl/*bedpe} |grep -v prom |grep -v enh| xargs wc -l > ${f}.number.txt
-    wc -l $f >> ${f}.number.txt && echo ${f}.number.txt && cat  ${f}.number.txt
-done
-
-## submit jobs 
-for f in ${loopdir}*all.pgl
-do
-    echo $f
-    f1=${f/all.pgl/m05_05.bedpe}
-    f2=${f/all.pgl/m10_m05.bedpe}
-    f3=${f/all.pgl/m15_m10.bedpe}
-    f4=${f/all.pgl/m20_m15.bedpe}
-    f5=${f/all.pgl/lt_m20.bedpe}
-    for pf in $f1 $f2 $f3 $f4 $f5; do echo $pf; qsub -k oe -v peakfile=$pf  ./HiC_scripts/callAPA.pbs; done 
-done
-
-## cat with annotation  
+## filter 
 for f in ${loopdir}*anno.pgl
 do
     echo $f

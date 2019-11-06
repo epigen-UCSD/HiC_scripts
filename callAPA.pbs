@@ -1,0 +1,30 @@
+#!/bin/bash
+#PBS -q condo
+#PBS -N callAPA  
+#PBS -l nodes=1:ppn=8
+#PBS -l mem=32gb
+#PBS -l walltime=8:00:00
+#PBS -V
+#PBS -m abe
+#PBS -A epigen-group
+# -v peakfile
+set -x
+PS4='+\d \t '
+source activate hic
+export _JAVA_OPTIONS="-Xmx30g"
+workdir=/home/zhc268/scratch/juicer/work/
+cd $workdir
+juicer_jar=/home/zhc268/data/software/juicer_github/CPU/common/juicer_tools.jar
+
+
+for sample in   Islet RMM_307_1_2_3 RMM_308_1_2_3 
+do
+    echo $sample 
+    echo $peakfile
+    mkdir -p ${workdir}/${sample}/apa/
+    java -jar $juicer_jar apa -u -r 10000 ${workdir}/${sample}/aligned/inter_30.hic $peakfile \
+             ${workdir}/${sample}/apa/$(basename $peakfile) && rm -r ${workdir}/${sample}/apa/$(basename $peakfile)/10000/*v* & sleep 1
+done
+wait
+
+
