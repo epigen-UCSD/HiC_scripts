@@ -3,7 +3,7 @@
 source activate hic
 workdir=/home/zhc268/scratch/juicer/work/
 loopdir=${workdir}cicero_res_v2/
-
+juicer_jar=/home/zhc268/data/software/juicer_github/CPU/common/juicer_tools.jar
 ############################################################
 # make bined peak files for cicero results 
 ############################################################
@@ -60,7 +60,7 @@ for f in ${loopdir}*m05_05.bedpe
 do
     pf=${f/bedpe/r${N}.bedpe}
     echo $f,$pf
-    shuf -n $N $f > $pf
+A    shuf -n $N $f > $pf
     wc -l $pf
     qsub -v peakfile=$pf  ./HiC_scripts/callAPA.pbs 
 done
@@ -144,4 +144,19 @@ do
     done
     wait 
 done
+
+
+############################################################
+# apa call - on 1000 resolution or 5000
+############################################################
+res=5000
+sample=RMM_308_1_2_3
+ls -1  ${loopdir}/beta_1_beta_2*filtered* ${loopdir}/beta_1_beta_2*[05].bedpe \
+   ${loopdir}*[ls].bedpe |grep -v "_m[12]"| \
+    while read peakfile
+    do
+        echo $peakfile
+        java -jar $juicer_jar apa -u -r $res ${workdir}/${sample}/aligned/inter_30.hic $peakfile \
+             ${workdir}/${sample}/apa/$(basename $peakfile) && rm -r ${workdir}/${sample}/apa/$(basename $peakfile)/${res}/*v* & sleep 1
+    done
 

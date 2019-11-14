@@ -19,3 +19,4 @@ hicfile="${workdir}/${sample}/aligned/${hic}"
 #hic2cool 0.7.3
 hic2cool convert $hicfile ${hicfile/.hic/.cool} 
 
+

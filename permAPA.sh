@@ -32,7 +32,7 @@ get_seeded_random()
 ############################################################
 N_PERM=1000
 TEMP_DIR=$(mktemp -d)
-final_res=${loopdir}"/beta_perm_res.txt" 
+final_res=${loopdir}"/beta_perm_res_"${sample}".txt" 
 export _JAVA_OPTIONS="-Xmx1g"
 juicer_jar=/home/zhc268/data/software/juicer_github/CPU/common/juicer_tools.jar
 cicero_res_file=${loopdir}'/beta_1_beta_2.cicero_all.pgl'

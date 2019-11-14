@@ -24,15 +24,19 @@ do
     f1=${loop_file/bedpe/300k_500k.bedpe}
     f2=${loop_file/bedpe/500k_750k.bedpe}
     f3=${loop_file/bedpe/750k_1m.bedpe}
+    f4=${loop_file/bedpe/lt_750k.bedpe}
+    f5=${loop_file/bedpe/gt_1m.bedpe}
     echo $f1 $f2 $f3
-    awk -v OFS='\t' -v f1=$f1 -v f2=$f2 -v f3=$f3 '{dist=sqrt(($2+$3-$5-$6)^2)/2;if(dist>=300000 && dist <500000) {print $0 > f1;}
-        else if(dist <750000) {print $0 > f2;} else if(dist <= 1000000){print $0 > f3;}}' $loop_file
-    wc -l $f1 $f2 $f3 >> $dist_record
+    awk -v OFS='\t' -v f1=$f1 -v f2=$f2 -v f3=$f3 -v f4=$f4 -v f5=$f5 '{dist=sqrt(($2+$3-$5-$6)^2)/2;if(dist>=300000 && dist <500000) {print $0 > f1;}
+        else if(dist>=500000 && dist <750000) {print $0 > f2;} else if(dist >=750000 && dist <= 1000000){print $0 > f3;} 
+        else if(dist >100000){print $0 > f5;} else{print $0 > f4}}' $loop_file
+    wc -l $f1 $f2 $f3 $f4 $f5 >> $dist_record
     wc -l $loop_file >> $dist_record
 done
+cat $dist_record
 
 ## call APA
-export _JAVA_OPTIONS="-Xmx2g"
+#export _JAVA_OPTIONS="-Xmx2g"
 juicer_jar=/home/zhc268/data/software/juicer_github/CPU/common/juicer_tools.jar
 for loop_set in beta_1_beta_2.cicero_gt_05 greenwald_2019_loops islet_pcHiC.CHiCAGO_interactions.intrachromsomal
 do
