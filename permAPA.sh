@@ -10,11 +10,15 @@
 source activate hic
 workdir=/home/zhc268/scratch/juicer/work/
 loopdir=${workdir}cicero_res_v2/
-sample=RMM_308_1_2_3
+sample=$1 #RMM_308_1_2_3
 cd $workdir
 N_PERM=1000
 N_LOOPS=10000
-
+RES_DIR=${workdir}${sample}/apa/perm_np${N_PERM}_nloops${N_LOOPS}/
+mkdir -p $RES_DIR
+TEMP_DIR=$(mktemp -d)
+BASE_LOOPS=beta_1_beta_2.cicero_all.pgl
+export _JAVA_OPTIONS="-Xmx1g"
 #############################################################
 # https://www.gnu.org/software/coreutils/manual/html_node/Random-sources.html
 ############################################################
@@ -30,22 +34,20 @@ get_seeded_random()
 ############################################################
 # main
 ############################################################
-N_PERM=1000
-TEMP_DIR=$(mktemp -d)
 final_res=${loopdir}"/beta_perm_res_"${sample}".txt" 
-export _JAVA_OPTIONS="-Xmx1g"
 juicer_jar=/home/zhc268/data/software/juicer_github/CPU/common/juicer_tools.jar
-cicero_res_file=${loopdir}'/beta_1_beta_2.cicero_all.pgl'
-cicero_res_bedpe=${TEMP_DIR}'/beta_1_beta_2.cicero_all.bedpe'
+cicero_res_file=${loopdir}"${BASE_LOOPS}"
+cicero_res_bedpe=${TEMP_DIR}"/${BASE_LOOPS/pgl/bedpe}"
 awk -v OFS='\t' '{$7="0,255,0";print $0}' $cicero_res_file >  $cicero_res_bedpe
-> $final_res
+0> $final_res
 for seed in $(seq 1 $N_PERM)
 do
     ## tmp file
     echo $seed
-    tmp_loops=${TEMP_DIR}/"beta_r"${N_LOOPS}"_"${seed}.bedpe
+    tmp_loops=${RES_DIR}"beta_seed"_${seed}.bedpe
     shuf --random-source=<(get_seeded_random $seed)  -n $N_LOOPS $cicero_res_bedpe > $tmp_loops
-    res_tmp_dir=$(mktemp -d)
+    res_tmp_dir=${tmp_loops/.bedpe/}
+    mkdir -p $res_tmp_dir
     res_tmp_apa=${res_tmp_dir}/10000/gw/rankAPA.txt
     java -jar $juicer_jar apa -u -r 10000 ${workdir}/${sample}/aligned/inter_30.hic $tmp_loops $res_tmp_dir 2>&1 1>/dev/null && \
         paste <(echo $seed)   <(awk -v FS=',' '(NR==11){print $11}' $res_tmp_apa) >> $final_res & sleep 1
