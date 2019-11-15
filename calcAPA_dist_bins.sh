@@ -24,7 +24,7 @@ do
     f1=${loop_file/bedpe/300k_500k.bedpe}
     f2=${loop_file/bedpe/500k_750k.bedpe}
     f3=${loop_file/bedpe/750k_1m.bedpe}
-    f4=${loop_file/bedpe/lt_750k.bedpe}
+    f4=${loop_file/bedpe/lt_300k.bedpe}
     f5=${loop_file/bedpe/gt_1m.bedpe}
     echo $f1 $f2 $f3
     awk -v OFS='\t' -v f1=$f1 -v f2=$f2 -v f3=$f3 -v f4=$f4 -v f5=$f5 '{dist=sqrt(($2+$3-$5-$6)^2)/2;if(dist>=300000 && dist <500000) {print $0 > f1;}
@@ -54,4 +54,22 @@ do
     wait 
 done
 
+
+
+############################################################
+# Fri Nov 15 14:28:38 PST 2019
+# apa call - on distance bins 1. 300-500kb 2. 500-700kb, 3. 750kb-1Mb for beta loops with score > 0.05
+############################################################
+
+workdir=/home/zhc268/scratch/juicer/work/
+loopdir=${workdir}cicero_res_v2/
+cd $workdir
+
+sample=RMM_307_1_2_3
+
+for loops in ${loopdir}beta*gt_05*0k*bedpe
+do
+    echo $loops
+    qsub -k oe -v peakfile=$loops,sample=$sample  ./HiC_scripts/callAPA.pbs    
+done
 
