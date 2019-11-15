@@ -17,14 +17,13 @@ cd $workdir
 juicer_jar=/home/zhc268/data/software/juicer_github/CPU/common/juicer_tools.jar
 
 
-for sample in   Islet RMM_307_1_2_3 RMM_308_1_2_3 
-do
-    echo $sample 
-    echo $peakfile
-    mkdir -p ${workdir}/${sample}/apa/
-    java -jar $juicer_jar apa -u -r 10000 ${workdir}/${sample}/aligned/inter_30.hic $peakfile \
-             ${workdir}/${sample}/apa/$(basename $peakfile) && rm -r ${workdir}/${sample}/apa/$(basename $peakfile)/10000/*v* & sleep 1
-done
-wait
+#for sample in   Islet RMM_307_1_2_3 RMM_308_1_2_3 
+
+echo $sample 
+echo $peakfile
+mkdir -p ${workdir}/${sample}/apa/
+java -jar $juicer_jar apa -u -r 10000 ${workdir}/${sample}/aligned/inter_30.hic $peakfile \
+     ${workdir}/${sample}/apa/$(basename $peakfile) && rm -r ${workdir}/${sample}/apa/$(basename $peakfile)/10000/*v* & sleep 1
+
 
 

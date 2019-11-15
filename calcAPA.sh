@@ -160,3 +160,23 @@ ls -1  ${loopdir}/beta_1_beta_2*filtered* ${loopdir}/beta_1_beta_2*[05].bedpe \
              ${workdir}/${sample}/apa/$(basename $peakfile) && rm -r ${workdir}/${sample}/apa/$(basename $peakfile)/${res}/*v* & sleep 1
     done
 
+
+############################################################
+# apa call - on 10000 resolution for beta cicero score > 0.05 
+############################################################
+
+cd $workdir 
+
+for f in ${loopdir}beta*all.pgl
+do
+    echo $f
+    f1=${f/all.pgl/gt_05.bedpe}
+    awk -v OFS='\t' -v f1=$f1 '($7>.05) {$7="0,255,0";print $0}' $f > $f1
+    wc -l $f1 >> ${f}.number.txt
+done
+
+for sample in RMM_308_1_2_3 RMM_307_1_2_3
+do
+    qsub -k oe -v peakfile=$f1,sample=$sample  ./HiC_scripts/callAPA.pbs
+done
+

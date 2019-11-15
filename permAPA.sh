@@ -19,6 +19,8 @@ mkdir -p $RES_DIR
 TEMP_DIR=$(mktemp -d)
 BASE_LOOPS=beta_1_beta_2.cicero_all.pgl
 export _JAVA_OPTIONS="-Xmx1g"
+juicer_jar=/home/zhc268/data/software/juicer_github/CPU/common/juicer_tools.jar
+
 #############################################################
 # https://www.gnu.org/software/coreutils/manual/html_node/Random-sources.html
 ############################################################
@@ -35,7 +37,6 @@ get_seeded_random()
 # main
 ############################################################
 final_res=${loopdir}"/beta_perm_res_"${sample}".txt" 
-juicer_jar=/home/zhc268/data/software/juicer_github/CPU/common/juicer_tools.jar
 cicero_res_file=${loopdir}"${BASE_LOOPS}"
 cicero_res_bedpe=${TEMP_DIR}"/${BASE_LOOPS/pgl/bedpe}"
 awk -v OFS='\t' '{$7="0,255,0";print $0}' $cicero_res_file >  $cicero_res_bedpe
