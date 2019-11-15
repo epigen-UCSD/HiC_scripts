@@ -180,3 +180,6 @@ do
     qsub -k oe -v peakfile=$f1,sample=$sample  ./HiC_scripts/callAPA.pbs
 done
 
+############################################################
+# apa call - on 10000 resolution for beta cicero score > 0.05 for each distance bin
+############################################################
