@@ -30,7 +30,7 @@ calcAPA <- function(loop_file, res = 10000, corner_size = 6, type = "rankAPA",sa
         return(NA)
     }  #return(data.frame(APA = NA, Zscore = NA)))
 }
-getAPApng <- function(idx, res = 10000, corner_size = 6, type = "rankAPA") {
+getAPApng <- function(idx, res = 10000, corner_size = 6, type = "rankAPA",sample="RMM_308_1_2_3") {
     apa_file <- paste0(sample, "/apa/", loop_stats$loop_file[idx], "/", res, "/gw/", 
         type, ".png")
     names(apa_file) <- loop_stats$loop_set[idx]
