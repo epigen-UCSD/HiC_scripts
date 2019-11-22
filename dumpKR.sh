@@ -1,7 +1,7 @@
 #!/bin/bash
 source activate hic
 workdir=/home/zhc268/scratch/juicer/work/
-sample=RMM_308_1_2_3
+sample=$1 #RMM_308_1_2_3
 juicer_jar=/home/zhc268/data/software/juicer_github/CPU/common/juicer_tools.jar
 hic="inter_30.hic"
 hicfile="${workdir}/${sample}/aligned/${hic}"
