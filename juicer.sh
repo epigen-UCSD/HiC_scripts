@@ -568,7 +568,7 @@ fi
 if [ -z "$earlyexit" ]
 then
     #Skip if post-processing only is required
-    if [ ! -z $postproc ] 
+    if [ -z $postproc ] 
     then        
         if [ "$nofrag" -eq 1 ]
         then 
