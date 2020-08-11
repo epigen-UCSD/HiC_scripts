@@ -15,3 +15,11 @@ a. Hi-C data from human fetal brain by [Won et al.](https://www.nature.com/artic
 b. DNase Hi-C data from Mouse adult brain by [Deng and Ma et al.](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-015-0728-8#Sec10), with data files available through 4DN portal [here](https://data.4dnucleome.org/experiment-set-replicates/4DNESRWDFFF8/#processed-files). I note that these data are also included in the juicebox pre-loaded datasets under "open" --> "Hi-C data archive", so oviously `\*.hic` files are already available, but would still ask for your help with end-point items (2) and (3) above.
 
 c. Hi-C data from the human SK-N-SH cell line by [Guo et al](https://pubmed.ncbi.nlm.nih.gov/26276636/), with data files available [here](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE71072). Need to re-process these (merging replicates).
+
+### table
+
+| dataset       | species |
+| ------------- | ------- |
+| Won_et_al     | human   |
+| deng_ma_et_al | mouse   |
+| guo_et_al     | human   |
