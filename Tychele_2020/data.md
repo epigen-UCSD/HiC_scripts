@@ -18,8 +18,8 @@ c. Hi-C data from the human SK-N-SH cell line by [Guo et al](https://pubmed.ncbi
 
 ### table
 
-| dataset       | species |
-| ------------- | ------- |
-| Won_et_al     | human   |
-| deng_ma_et_al | mouse   |
-| guo_et_al     | human   |
+| dataset       | species | link                                                     |
+| ------------- | ------- | -------------------------------------------------------- |
+| Won_et_al     | human   |                                                          |
+| deng_ma_et_al | mouse   | `/oasis/tscc/scratch/zhc268/juicer/work/DengMa/aligned/` |
+| guo_et_al     | human   |                                                          |
