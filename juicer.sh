@@ -335,7 +335,7 @@ fi
 echo -ne "Juicer version $juicer_version;" >> $headfile
 bwa 2>&1 | awk '$1=="Version:"{printf(" BWA %s; ", $2)}' >> $headfile 
 echo -ne "$threads threads; " >> $headfile
-java -version 2>&1 | awk 'NR==1{printf("%s; ", $0);}' >> $headfile 
+java -version 2>&1 | awk 'NR==1{printf("%s; ", $0);}' >> $headfile || echo "java not found" && exit 1
 ${juiceDir}/scripts/juicer_tools -V 2>&1 | awk '$1=="Juicer" && $2=="Tools"{printf("%s; ", $0);}' >> $headfile
 echo "$0 $@" >> $headfile
 
@@ -472,6 +472,18 @@ then
                echo "***! Failure during chimera handling of $name${ext}"
                exit 1
 	   fi
+
+           # call chimeric_blacklist.awk to deal with chimeric reads; 
+           # sorted file is sorted by read name at this point
+	   touch $name${ext}_abnorm.sam $name${ext}_unmapped.sam
+	   awk -v "fname1"=$name${ext}_norm.txt -v "fname2"=$name${ext}_abnorm.sam -v "fname3"=$name${ext}_unmapped.sam -f ${juiceDir}/scripts/common/chimeric_blacklist.awk $name$ext.sam
+	   if [ $? -ne 0 ]
+	   then
+               echo "***! Failure during chimera handling of $name${ext}"
+               exit 1
+	   fi
+
+           
         else
             echo "skipped chimeric reads" 
         fi
