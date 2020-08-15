@@ -68,5 +68,4 @@ cd $scratch_folder; cd ..
 qsub -v sample=GUO run.pbs
 rsync -avzr $scratch_folder ~/data/outputs/HiC
 qsub -v sample=GUO,chr=10 ./runHiccups.pbs
-
 dumpKR.sh GUO 10 25000

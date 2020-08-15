@@ -335,7 +335,8 @@ fi
 echo -ne "Juicer version $juicer_version;" >> $headfile
 bwa 2>&1 | awk '$1=="Version:"{printf(" BWA %s; ", $2)}' >> $headfile 
 echo -ne "$threads threads; " >> $headfile
-java -version 2>&1 | awk 'NR==1{printf("%s; ", $0);}' >> $headfile || echo "java not found" && exit 1
+java -version > /dev/null || ( echo "java not found" && exit 1 ) 
+java -version 2>&1 | awk 'NR==1{printf("%s; ", $0);}' >> $headfile 
 ${juiceDir}/scripts/juicer_tools -V 2>&1 | awk '$1=="Juicer" && $2=="Tools"{printf("%s; ", $0);}' >> $headfile
 echo "$0 $@" >> $headfile
 
@@ -462,7 +463,10 @@ then
                rm $name1$ext*.sa* $name2$ext*.sa* 
                echo "(-: $name$ext.sam created successfully."
 	   fi
-           
+        fi
+        
+        if [ -z $postalign2 ]
+        then
            # call chimeric_blacklist.awk to deal with chimeric reads; 
            # sorted file is sorted by read name at this point
 	   touch $name${ext}_abnorm.sam $name${ext}_unmapped.sam
@@ -514,7 +518,9 @@ then
     then
         mv $donesplitdir/* $splitdir/.
     fi
-    if ! sort -T $tmpdir -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n $splitdir/*.sort.txt  > $outputdir/merged_sort.txt
+    if  [ $(ll $splitdir/*.sort.txt|wc -l) -eq 1 ]; then
+        ln -s $splitdir/*.sort.txt $outputdir/merged_sort.txt
+    elif ! sort -T $tmpdir -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n $splitdir/*.sort.txt  > $outputdir/merged_sort.txt
     then 
         echo "***! Some problems occurred somewhere in creating sorted align files."
         exit 1
