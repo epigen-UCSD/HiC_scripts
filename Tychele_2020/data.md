@@ -24,7 +24,7 @@ c. Hi-C data from the human SK-N-SH cell line by [Guo et al](https://pubmed.ncbi
 | deng_ma_et_al | mouse   | `/oasis/tscc/scratch/zhc268/juicer/work/DengMa/aligned/` | 1,2,3,  |
 | guo_et_al     | human   | `/oasis/tscc/scratch/zhc268/juicer/work/GUO/aligned/`    | 1,2,3   |
 
-### Note on [Deng and Ma et al.](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-015-0728-8#Sec10)
+### Note on [Won et al.](https://www.nature.com/articles/nature19847)
 
 > **Hi-C reads mapping and pre-processing**
 
