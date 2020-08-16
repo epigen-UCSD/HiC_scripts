@@ -1,3 +1,4 @@
+
 # Datasets
 
 ## End points
@@ -31,3 +32,4 @@ c. Hi-C data from the human SK-N-SH cell line by [Guo et al](https://pubmed.ncbi
 > Mapping and filtering of the reads, as well as normalization of experimental and intrinsic biases of Hi-C contact matrices, were conducted with the following method regardless of cell type to minimize potential variance in the data obtained from different platforms. We implemented hiclib (https://bitbucket.org/mirnylab/hiclib) to perform initial analysis on Hi-C data from mapping to filtering and bias correction. Briefly, quality analysis was performed using a phred score, and sequenced reads were mapped to hg19 human genome by Bowtie2 (with increased stringency, –score-min -L 0.6,0.2–very-sensitive) through iterative mapping. Read pairs were then allocated to HindIII restriction enzyme fragments. Self-ligated and unligated fragments, fragments from repeated regions of the genome, PCR artefacts, and genome assembly errors were removed. Filtered reads were binned at 10 kb, 40 kb, and 100 kb resolution to build a genome-wide contact matrix at a given bin size. Biases can be introduced to contact matrices by experimental procedures and intrinsic properties of the genome. To decompose biases from the contact matrix and yield a true contact probability map, filtered bins were subjected to iterative correction9, the basic assumption of which is that each locus has uniform coverage. _Bias correction and normalization results in a corrected heat map of bin-level resolution. 100-kb resolution bins were assessed for inter-chromosomal interactions, 40 kb for TAD analysis, and 10 kb for gene loop detection_.
 
 In the end, only `10kb` heatmap data were used and extracted to `GSE77565_FBP_IC-heatmap-chr-10k.dump.chr10.csv` and `GSE77565_FBD_IC-heatmap-chr-10k.dump.chr10.csv`.
+
