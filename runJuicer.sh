@@ -8,7 +8,8 @@
 #PBS -m abe
 #PBS -A epigen-group
 
-# -v sample=,stage=(optional)
+sample=$1
+stage=$2
 
 source activate hic
 

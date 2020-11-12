@@ -69,3 +69,21 @@ qsub -v sample=GUO run.pbs
 rsync -avzr $scratch_folder ~/data/outputs/HiC
 qsub -v sample=GUO,chr=10 ./runHiccups.pbs
 dumpKR.sh GUO 10 25000
+
+############################################################
+# 4. Bonev et al 
+############################################################
+## http://hicfiles.tc4ga.com/juicebox.properties
+## __External_2017Bonev_EScells = __External_2017Bonev, ES cells, http://hicfiles.s3.amazonaws.com/external/bonev/ES_mapq30.hic
+#__External_2017Bonev_NPC = __External_2017Bonev, Neural Progenitors, http://hicfiles.s3.amazonaws.com/external/bonev/NPC_mapq30.hic
+#__External_2017Bonev_CN = __External_2017Bonev, Cortical Neurons, http://hicfiles.s3.amazonaws.com/external/bonev/CN_mapq30.hic
+
+mkdir -p /home/zhc268/scratch/juicer/work/bonev
+cd /home/zhc268/scratch/juicer/work/bonev
+for url in http://hicfiles.s3.amazonaws.com/external/bonev/ES_mapq30.hic http://hicfiles.s3.amazonaws.com/external/bonev/NPC_mapq30.hic http://hicfiles.s3.amazonaws.com/external/bonev/CN_mapq30.hic
+do
+    echo $url 
+    bash ~/github/HiC_scripts/runHiccups_online.sh $url 7
+done
+
+
