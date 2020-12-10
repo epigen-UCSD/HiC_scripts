@@ -36,7 +36,7 @@ centroid_distances="20000,20000,50000"
 output="${workdir}/${sample}/aligned/"
 
 # Usage:   juicer_tools hiccups [-m matrixSize] [-k normalization (NONE/VC/VC_SQRT/KR)] [-c chromosome(s)] [-r resolution(s)] [-f fdr] [-p peak width] [-i window] [-t thresholds] [-d centroid distances] [--ignore_sparsity]<hicFile> <outputDirectory> [specified_loop_list]
-cmd="/projects/ps-epigen/software/miniconda3/envs/bds_atac/bin/java -jar $juicer_jar hiccups  -m $matrixSize -k $normalization -c $chr -r $res -f $fdr -p $peak_width -i $window -t $thresholds -d $centroid_distances $hicfile $output --ignore_sparsity"
+cmd="/projects/ps-epigen/software/miniconda3/envs/bds_atac/bin/java -jar $juicer_jar hiccups  -m $matrixSize -k $normalization -c $chr -r $res -f $fdr -p $peak_width -i $window -t $thresholds -d $centroid_distances $hicfile $output --ignore-sparsity"
 echo $cmd                                                               
 echo $cmd |bash 
 
